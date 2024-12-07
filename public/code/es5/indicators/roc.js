@@ -1,0 +1,12 @@
+!/**
+ * Highstock JS v12.0.1 (2024-11-28)
+ * @module highcharts/indicators/roc
+ * @requires highcharts
+ * @requires highcharts/modules/stock
+ *
+ * Indicator series type for Highcharts Stock
+ *
+ * (c) 2010-2024 Kacper Madej
+ *
+ * License: www.highcharts.com/license
+ */function(t,r){"object"==typeof exports&&"object"==typeof module?module.exports=r(require("highcharts"),require("highcharts").SeriesRegistry):"function"==typeof define&&define.amd?define("highcharts/roc",[["highcharts/highcharts"],["highcharts/highcharts","SeriesRegistry"]],r):"object"==typeof exports?exports["highcharts/roc"]=r(require("highcharts"),require("highcharts").SeriesRegistry):t.Highcharts=r(t.Highcharts,t.Highcharts.SeriesRegistry)}(this,function(t,r){return function(){"use strict";var e,n={512:function(t){t.exports=r},944:function(r){r.exports=t}},o={};function i(t){var r=o[t];if(void 0!==r)return r.exports;var e=o[t]={exports:{}};return n[t](e,e.exports,i),e.exports}i.n=function(t){var r=t&&t.__esModule?function(){return t.default}:function(){return t};return i.d(r,{a:r}),r},i.d=function(t,r){for(var e in r)i.o(r,e)&&!i.o(t,e)&&Object.defineProperty(t,e,{enumerable:!0,get:r[e]})},i.o=function(t,r){return Object.prototype.hasOwnProperty.call(t,r)};var u={};i.d(u,{default:function(){return x}});var s=i(944),a=/*#__PURE__*/i.n(s),c=i(512),h=/*#__PURE__*/i.n(c),p=(e=function(t,r){return(e=Object.setPrototypeOf||({__proto__:[]})instanceof Array&&function(t,r){t.__proto__=r}||function(t,r){for(var e in r)Object.prototype.hasOwnProperty.call(r,e)&&(t[e]=r[e])})(t,r)},function(t,r){if("function"!=typeof r&&null!==r)throw TypeError("Class extends value "+String(r)+" is not a constructor or null");function n(){this.constructor=t}e(t,r),t.prototype=null===r?Object.create(r):(n.prototype=r.prototype,new n)}),f=h().seriesTypes.sma,l=a().isArray,y=a().merge,g=a().extend,d=function(t){function r(){return null!==t&&t.apply(this,arguments)||this}return p(r,t),r.prototype.getValues=function(t,r){var e,n,o=r.period,i=t.xData,u=t.yData,s=u?u.length:0,a=[],c=[],h=[],p=-1;if(!(i.length<=o)){for(l(u[0])&&(p=r.index),e=o;e<s;e++)n=function(t,r,e,n,o){var i,u;return u=o<0?(i=r[e-n])?(r[e]-i)/i*100:null:(i=r[e-n][o])?(r[e][o]-i)/i*100:null,[t[e],u]}(i,u,e,o,p),a.push(n),c.push(n[0]),h.push(n[1]);return{values:a,xData:c,yData:h}}},r.defaultOptions=y(f.defaultOptions,{params:{index:3,period:9}}),r}(f);g(d.prototype,{nameBase:"Rate of Change"}),h().registerSeriesType("roc",d);var x=a();return u.default}()});
