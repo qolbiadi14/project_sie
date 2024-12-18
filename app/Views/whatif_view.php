@@ -145,12 +145,12 @@
                             <table class="info-table">
                                 <tbody>
                                     <tr>
-                                        <td class="info-label" width="30%">Harga Sepeda</td>
+                                        <td class="info-label" width="35%">Harga Sepeda</td>
                                         <td width="5%">:</td>
                                         <td class="info-value" id="product-price">-</td>
                                     </tr>
                                     <tr>
-                                        <td class="info-label">Total Penjualan</td>
+                                        <td class="info-label">Total Sepeda Terjual</td>
                                         <td>:</td>
                                         <td class="info-value" id="product-sales">-</td>
                                     </tr>
@@ -167,19 +167,19 @@
                         <div class="card">
                             <div class="card-title card-target">Analisis What-If Target Pendapatan</div>
                             <div id="card-target-content">
-                                <!-- <div class="form-group">
-                                    <label for="select-variable">Variabel yang Diubah</label>
+                                <div class="form-group">
+                                    <label for="select-variable">Variabel yang Ingin Diubah</label>
                                     <select id="select-variable" class="form-control">
                                         <option value="" selected disabled>Pilih Variabel</option>
                                         <option value="price">Harga</option>
-                                        <option value="sales">Total Penjualan</option>
+                                        <option value="sales">Total Sepeda Terjual</option>
                                         <option value="revenue">Total Pendapatan</option>
                                     </select>
-                                </div> -->
+                                </div>
                                 <div class="form-group">
-                                    <label for="input-target">Target Pendapatan</label>
-                                    <input type="text" id="input-target" class="form-control"
-                                        placeholder="Masukkan target pendapatan">
+                                    <label for="input-target">Nilai Variabel</label>
+                                    <input type="number" id="input-target" class="form-control"
+                                        placeholder="Masukkan nilai">
                                 </div>
                                 <button class="btn-whatif">Analisis What-If</button>
                             </div>
@@ -191,46 +191,46 @@
                         <div class="card-title card-analisis-hasil">Hasil Analisis What-If</div>
                         <div class="card-body">
                             <div class="card">
-                                <div class="card-title">Jika Harga Sepeda Tetap</div>
+                                <div class="card-title" id="hasil-1"></div>
                                 <table>
                                     <tbody>
                                         <tr>
-                                            <td width="30%"><strong>Harga</strong></td>
+                                            <td width="50%" id="caption-price-1"><strong>Harga</strong></td>
                                             <td>:</td>
-                                            <td><span id="result-price">-</span></td>
+                                            <td>$<span id="result-price-1">-</span></td>
                                         </tr>
                                         <tr>
-                                            <td width="30%"><strong style="color: red">Total Penjualan</strong></td>
+                                            <td width="50%" id="caption-sales-1"><strong>Total Sepeda Terjual</strong></td>
                                             <td>:</td>
-                                            <td><span id="new-sales-total">-</span> barang</td>
+                                            <td><span id="result-sales-1">-</span> barang</td>
                                         </tr>
                                         <tr>
-                                            <td width="30%"><strong style="color: green">Pendapatan</strong></td>
+                                            <td width="50%" id="caption-revenue-1"><strong>Pendapatan</strong></td>
                                             <td>:</td>
-                                            <td>$<span class="result-target-revenue">-</span></td>
+                                            <td>$<span id="result-revenue-1">-</span></td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                             <div class="card">
-                                <div class="card-title">Jika Total Penjualan Sepeda Tetap
+                                <div class="card-title" id="hasil-2">
                                 </div>
                                 <table>
                                     <tbody>
                                         <tr>
-                                            <td width="30%"><strong style="color: red">Harga</strong></td>
+                                            <td width="50%" id="caption-price-2"><strong>Harga</strong></td>
                                             <td>:</td>
-                                            <td>$<span id="new-price">-</span></td>
+                                            <td>$<span id="result-price-2">-</span></td>
                                         </tr>
                                         <tr>
-                                            <td width="30%"><strong>Total Penjualan</strong></td>
+                                            <td width="50%" id="caption-sales-2"><strong>Total Sepeda Terjual</strong></td>
                                             <td>:</td>
-                                            <td><span id="result-sales-total">-</span></td>
+                                            <td><span id="result-sales-2">-</span></td>
                                         </tr>
                                         <tr>
-                                            <td width="30%"><strong style="color: green">Pendapatan</strong></td>
+                                            <td width="50%" id="caption-revenue-2"><strong>Pendapatan</strong></td>
                                             <td>:</td>
-                                            <td>$<span class="result-target-revenue">-</span></td>
+                                            <td>$<span id="result-revenue-2">-</span></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -350,13 +350,18 @@
 
             // event klik tombol Analisis What-If
             $('.btn-whatif').click(function() {
-                const target_revenue = $('#input-target').val();
+
+                const revenue = $('#product-revenue').text().replace('$', '');
                 const product_price = $('#product-price').text().replace('$', '');
                 const product_sales = $('#product-sales').text().replace(' barang', '');
+                const variable = $('#select-variable').val()
+                const target_variable_value = $('#input-target').val()
+
+                console.log(revenue, product_price, product_sales, variable, target_variable_value);
 
                 // validasi input target pendapatan
-                if (!target_revenue || isNaN(target_revenue) || target_revenue <= 0) {
-                    alert('Masukkan target pendapatan yang valid!');
+                if (!target_variable_value) {
+                    alert('Masukkan nilai variabel!');
                     return;
                 }
 
@@ -373,18 +378,76 @@
                     data: {
                         price: product_price,
                         total_sales: product_sales,
-                        target_revenue: target_revenue
+                        revenue: revenue,
+                        variable: variable,
+                        target_variable_value: target_variable_value,
                     },
                     success: function(response) {
+                        console.log(response);
                         if (response.status === 'success') {
                             const data = response.data;
 
                             // menampilkan hasil analisis
-                            $('#result-price').text($('#product-price').text());
-                            $('#new-sales-total').text(data.new_sales_total);
-                            $('#new-price').text(data.new_price);
-                            $('#result-sales-total').text($('#product-sales').text());
-                            $('.result-target-revenue').text(target_revenue);
+                            if (variable === 'price') {
+                                $('#result-price-1').text(target_variable_value);
+                                $('#result-price-2').text(target_variable_value);
+                                $('#caption-price-1').css('color', 'green');
+                                $('#caption-price-2').css('color', 'green');
+
+                                // jika jumlah revenue tetap
+                                $('#hasil-1').text('Jika Total Pendapatan Tetap');
+                                $('#result-sales-1').text(data.new_sales_total_if_price);
+                                $('#caption-sales-1').css('color', 'red');
+                                $('#result-revenue-1').text(revenue);
+                                $('#caption-revenue-1').css('color', 'black');
+
+
+                                // jika sales tetap
+                                $('#hasil-2').text('Jika Total Sepeda Terjual Tetap');
+                                $('#result-sales-2').text(product_sales);
+                                $('#caption-sales-2').css('color', 'black');
+                                $('#result-revenue-2').text(data.new_revenue_if_price);
+                                $('#caption-revenue-2').css('color', 'red');
+                            } else if (variable === 'sales') {
+                                $('#result-sales-1').text(target_variable_value);
+                                $('#result-sales-2').text(target_variable_value);
+                                $('#caption-sales-1').css('color', 'green');
+                                $('#caption-sales-2').css('color', 'green');
+
+                                // jika harga tetap
+                                $('#hasil-1').text('Jika Harga Tetap');
+                                $('#result-price-1').text(product_price);
+                                $('#caption-price-1').css('color', 'black');
+                                $('#result-revenue-1').text(data.new_revenue_if_sales);
+                                $('#caption-revenue-1').css('color', 'red');
+
+                                // jika revenue tetap
+                                $('#hasil-2').text('Jika Total Pendapatan Tetap');
+                                $('#result-price-2').text(data.new_price_if_sales);
+                                $('#caption-price-2').css('color', 'red');
+                                $('#result-revenue-2').text(revenue);
+                                $('#caption-revenue-2').css('color', 'black');
+                            } else if (variable === 'revenue') {
+                                $('#result-revenue-1').text(target_variable_value);
+                                $('#result-revenue-2').text(target_variable_value);
+                                $('#caption-revenue-1').css('color', 'green');
+                                $('#caption-revenue-2').css('color', 'green');
+
+                                // jika harga tetap
+                                $('#hasil-1').text('Jika Harga Tetap');
+                                $('#result-price-1').text(product_price);
+                                $('#caption-price-1').css('color', 'black');
+                                $('#result-sales-1').text(data.new_sales_total_if_revenue);
+                                $('#caption-sales-1').css('color', 'red');
+
+                                // jika sales tetap
+                                $('#hasil-2').text('Jika Total Sepeda Terjual Tetap');
+                                $('#result-price-2').text(data.new_price_if_revenue);
+                                $('#caption-price-2').css('color', 'red');
+                                $('#result-sales-2').text(product_sales);
+                                $('#caption-sales-2').css('color', 'black');
+                            }
+
 
                             $('#card-analisis-hasil').show();
                         } else {
@@ -397,6 +460,9 @@
                 });
             });
 
+            function showWhatIfResult() {
+                $('#card-analisis-hasil').show();
+            }
             // Fungsi untuk mereset informasi produk
             function resetProductInfo() {
                 $('#product-price').text('-');

@@ -162,18 +162,18 @@
                     type: 'column'
                 },
                 title: {
-                    text: 'Data Penjualan Tahun 2016 - 2018'
+                    text: 'Data Pendapatan Tahun 2016 - 2018'
                 },
                 xAxis: {
                     type: 'category'
                 },
                 yAxis: {
                     title: {
-                        text: 'Total Penjualan dalam $'
+                        text: 'Total Pendapatan dalam $'
                     }
                 },
                 series: [{
-                    name: 'Total Penjualan $',
+                    name: 'Total Pendapatan $',
                     colorByPoint: true,
                     data: seriesData
                 }],

@@ -86,42 +86,70 @@ class WhatIfController extends BaseController
     public function analyseWhatIf()
     {
         // ambil data dari request
+        $variable = $this->request->getPost('variable');
         $price = $this->request->getPost('price');
         $sales_total = $this->request->getPost('total_sales');
-        $target_revenue = $this->request->getPost('target_revenue');
+        $revenue = $this->request->getPost('revenue');
+        $target_variable_value = $this->request->getPost('target_variable_value');
 
         // validasi input
-        if (!$price || !$sales_total || !$target_revenue) {
+        if (!$variable || !$price || !$sales_total || !$revenue || !$target_variable_value) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'Semua input (price, total_sales, target_revenue) harus diisi.',
+                'message' => 'Semua input (variable, price, total_sales, revenue, target_variable_value) harus diisi.',
             ]);
         }
 
-        if ($price <= 0 || $sales_total <= 0 || $target_revenue <= 0) {
+        if ($price <= 0 || $sales_total <= 0 || $revenue <= 0 || $target_variable_value <= 0) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'Nilai price, total_sales, dan target_revenue harus lebih besar dari nol.',
+                'message' => 'Nilai price, total_sales, revenue, dan target_variable_value harus lebih besar dari nol.',
             ]);
         }
 
-        // Perhitungan analisis What-If
-        // Jika harga tetap, hitung total penjualan baru
-        $new_sales_total = $target_revenue / $price;
+        $result = [];
 
-        // Jika total penjualan tetap, hitung harga baru
-        $new_price = $target_revenue / $sales_total;
+        switch ($variable) {
+            case 'price':
+                // Jika harga diubah
+                $new_sales_total_if_price = ceil($revenue / $target_variable_value);
+                $new_revenue_if_price = $target_variable_value * $sales_total;
+                $result = [
+                    'new_sales_total_if_price' => $new_sales_total_if_price,
+                    'new_revenue_if_price' => $new_revenue_if_price,
+                ];
+                break;
 
-        // Pembulatan hasil
-        $new_sales_total = ceil($new_sales_total);
-        $new_price = round($new_price, 2);
+            case 'sales':
+                // Jika total penjualan diubah
+                $new_revenue_if_sales = $price * $target_variable_value;
+                $new_price_if_sales = round($revenue / $target_variable_value, 2);
+                $result = [
+                    'new_revenue_if_sales' => $new_revenue_if_sales,
+                    'new_price_if_sales' => $new_price_if_sales,
+                ];
+                break;
+
+            case 'revenue':
+                // Jika total pendapatan diubah
+                $new_sales_total_if_revenue = ceil($target_variable_value / $price);
+                $new_price_if_revenue = round($target_variable_value / $sales_total, 2);
+                $result = [
+                    'new_sales_total_if_revenue' => $new_sales_total_if_revenue,
+                    'new_price_if_revenue' => $new_price_if_revenue,
+                ];
+                break;
+
+            default:
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Variabel yang dipilih tidak valid.',
+                ]);
+        }
 
         return $this->response->setJSON([
             'status' => 'success',
-            'data' => [
-                'new_sales_total' => $new_sales_total,
-                'new_price' => $new_price,
-            ],
+            'data' => $result,
         ]);
     }
 }
