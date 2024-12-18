@@ -37,14 +37,15 @@ class DrilldownModel extends Model
         return $query->getResult();
     }
 
-    public function getSalesPerProduct($brand)
+    public function getSalesPerProduct($brand, $year)
     {
         $builder = $this->db->table('order_items');
         $builder->select('products.product_name, SUM(order_items.quantity * order_items.list_price) AS total_sales', false);
         $builder->join('orders', 'order_items.order_id = orders.order_id');
         $builder->join('products', 'order_items.product_id = products.product_id');
         $builder->join('brands', 'products.brand_id = brands.brand_id');
-        $builder->where('brands.brand_name', $brand); // Ensure we filter by brand name
+        $builder->where('brands.brand_name', $brand);
+        $builder->where('YEAR(orders.order_date)', $year);
         $builder->groupBy('products.product_id');
         $builder->orderBy('total_sales', 'DESC');
         $query = $builder->get();

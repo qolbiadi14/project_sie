@@ -105,13 +105,12 @@
         <!-- Sidebar -->
         <?= view('partials/sidebar') ?>
 
-        <!-- Content Wrapper -->
         <div class="content-wrapper">
             <!-- Content Header -->
             <div class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
-                        <div class="col-sm-6">
+                        <div class="col-sm-10">
                             <h1 class="m-0"><?= $title ?> Pendapatan Toko Sepeda</h1>
                         </div>
                     </div>
@@ -138,15 +137,11 @@
                             <!-- Dropdown untuk memilih produk -->
                             <div class="form-group">
                                 <label for="select-product">Pilih Sepeda</label>
-                                <select id="select-product" class="form-control select2">
-                                    <option value="">Pilih Produk</option>
-                                    <?php foreach ($products as $product): ?>
-                                        <option value="<?= $product['product_id'] ?>"><?= $product['product_name'] ?>
-                                        </option>
-                                    <?php endforeach; ?>
+                                <select id="select-product" class="form-control select2" disabled>
+                                    <option value="">Pilih Tahun Terlebih Dahulu</option>
                                 </select>
                             </div>
-                            <!-- Data Sepeda -->
+                            <!-- Kartu untuk menampilkan data sepeda -->
                             <table class="info-table">
                                 <tbody>
                                     <tr>
@@ -168,7 +163,7 @@
                             </table>
                         </div>
 
-                        <!-- Data Target Pendapatan -->
+                        <!-- Kartu untuk input target pendapatan -->
                         <div class="card">
                             <div class="card-title card-target">Analisis What-If Target Pendapatan</div>
                             <div id="card-target-content">
@@ -191,7 +186,7 @@
                         </div>
                     </div>
 
-                    <!-- Tampilan Hasil Analisis What-If -->
+                    <!-- Tampilan hasil analisis What-If -->
                     <div class="card" id="card-analisis-hasil" style="display: none;">
                         <div class="card-title card-analisis-hasil">Hasil Analisis What-If</div>
                         <div class="card-body">
@@ -256,7 +251,7 @@
     <script src="<?= base_url('adminlte/plugins/select2/js/select2.full.min.js') ?>"></script>
     <script src="<?= base_url('adminlte/dist/js/adminlte.min.js') ?>"></script>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             // Inisialisasi Select2
             $('.select2').select2({
                 theme: 'bootstrap4',
@@ -264,8 +259,63 @@
                 allowClear: true
             });
 
-            // Menampilkan detail produk setelah tahun dan produk dipilih
-            $('#select-year, #select-product').change(function () {
+            const $productDropdown = $('#select-product');
+            const $yearDropdown = $('#select-year');
+
+            $yearDropdown.change(function() {
+                const selectedYear = $(this).val();
+
+                // reset dropdown produk
+                resetProductDropdown();
+
+                if (selectedYear) {
+                    // aktifkan dropdown produk
+                    $productDropdown.prop('disabled', false);
+
+                    // load data produk berdasarkan tahun
+                    $.ajax({
+                        url: "<?= base_url('whatif/getProductsByYear') ?>",
+                        type: "POST",
+                        data: {
+                            year: selectedYear
+                        },
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                // tambahkan data produk ke dropdown
+                                populateProductDropdown(response.products);
+                            } else {
+                                alert(response.message);
+                            }
+                        },
+                        error: function() {
+                            alert('Gagal mengambil data produk.');
+                        }
+                    });
+                } else {
+                    // jika tahun kosong, matikan dropdown produk
+                    $productDropdown.prop('disabled', true);
+                }
+            });
+
+            function populateProductDropdown(products) {
+                $productDropdown.append('<option value="">Pilih Produk</option>');
+                products.forEach(product => {
+                    const optionText = `${product.product_name} (${product.category_name})`;
+                    $productDropdown.append(new Option(optionText, product.product_id));
+                });
+            }
+
+            // mereset dropdown Produk
+            function resetProductDropdown() {
+                $productDropdown.prop('disabled', true).empty();
+                $productDropdown.append('<option value="">Pilih Tahun Terlebih Dahulu</option>');
+                $('#product-price').text('-');
+                $('#product-sales').text('-');
+                $('#product-revenue').text('-');
+            }
+
+            // menampilkan detail produk setelah tahun dan produk dipilih
+            $('#select-year, #select-product').change(function() {
                 const year = $('#select-year').val();
                 const productId = $('#select-product').val();
 
@@ -277,7 +327,7 @@
                             year,
                             product_id: productId
                         },
-                        success: function (response) {
+                        success: function(response) {
                             if (response.status === 'success') {
                                 const data = response.data;
                                 $('#product-price').text('$' + data.product_price);
@@ -288,7 +338,7 @@
                                 alert(response.message);
                             }
                         },
-                        error: function () {
+                        error: function() {
                             resetProductInfo();
                             alert('Terjadi kesalahan saat mengambil data.');
                         }
@@ -298,25 +348,25 @@
                 }
             });
 
-            // Menangani klik tombol Analisis What-If
-            $('.btn-whatif').click(function () {
+            // event klik tombol Analisis What-If
+            $('.btn-whatif').click(function() {
                 const target_revenue = $('#input-target').val();
                 const product_price = $('#product-price').text().replace('$', '');
                 const product_sales = $('#product-sales').text().replace(' barang', '');
 
-                // Validasi input target pendapatan
+                // validasi input target pendapatan
                 if (!target_revenue || isNaN(target_revenue) || target_revenue <= 0) {
                     alert('Masukkan target pendapatan yang valid!');
                     return;
                 }
 
-                // Validasi data harga dan penjualan
+                // validasi data harga dan penjualan
                 if (isNaN(product_price) || isNaN(product_sales)) {
                     alert('Data harga dan penjualan produk tidak valid!');
                     return;
                 }
 
-                // Mengirimkan data ke controller analyseWhatIf
+                // mengirimkan data ke controller analyseWhatIf
                 $.ajax({
                     url: "<?= base_url('whatif/analyseWhatIf') ?>",
                     type: "POST",
@@ -325,24 +375,23 @@
                         total_sales: product_sales,
                         target_revenue: target_revenue
                     },
-                    success: function (response) {
+                    success: function(response) {
                         if (response.status === 'success') {
                             const data = response.data;
 
-                            // Menampilkan hasil analisis dalam card
+                            // menampilkan hasil analisis
                             $('#result-price').text($('#product-price').text());
                             $('#new-sales-total').text(data.new_sales_total);
                             $('#new-price').text(data.new_price);
                             $('#result-sales-total').text($('#product-sales').text());
                             $('.result-target-revenue').text(target_revenue);
 
-                            // Menampilkan card hasil analisis
                             $('#card-analisis-hasil').show();
                         } else {
                             alert(response.message);
                         }
                     },
-                    error: function () {
+                    error: function() {
                         alert('Terjadi kesalahan saat melakukan analisis.');
                     }
                 });

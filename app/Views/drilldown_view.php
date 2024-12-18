@@ -141,11 +141,11 @@
     <!-- OPTIONAL SCRIPTS -->
     <script src="<?= base_url('adminlte/plugins/chart.js/Chart.min.js') ?>"></script>
     <!-- AdminLTE for demo purposes -->
-    <script src="<?= base_url('adminlte/dist/js/demo.js') ?>"></script>
+    <!-- <script src="<?= base_url('adminlte/dist/js/demo.js') ?>"></script> -->
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
     <script src="<?= base_url('adminlte/dist/js/pages/dashboard3.js') ?>"></script>
     <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             console.log('Document loaded');
             const salesData = <?= json_encode($sales_per_year) ?>;
             console.log('Sales Data:', salesData);
@@ -188,10 +188,10 @@
             });
 
             // Fetch drilldown data dynamically
-            Highcharts.addEvent(Highcharts.Chart, 'drilldown', function (e) {
+            Highcharts.addEvent(Highcharts.Chart, 'drilldown', function(e) {
                 if (!e.seriesOptions) {
                     const chart = this;
-                    let level, value;
+                    let level, value, year;
 
                     if (e.point.drilldown.match(/^\d{4}$/)) {
                         level = 'year';
@@ -199,6 +199,7 @@
                     } else if (e.point.drilldown.includes('-')) {
                         level = 'brand';
                         value = e.point.drilldown.split('-')[1];
+                        year = e.point.drilldown.split('-')[0];
                     } else {
                         level = 'brand';
                         value = e.point.name;
@@ -209,7 +210,7 @@
 
                     chart.showLoading('Loading data...');
 
-                    fetch(`<?= base_url('drilldown/getDrilldownData') ?>/${level}/${value}`)
+                    fetch(`<?= base_url('drilldown/getDrilldownData') ?>/${level}/${value}?year=${year || e.point.name}`)
                         .then(response => response.json())
                         .then(data => {
                             console.log('Drilldown Data:', data);
@@ -223,7 +224,7 @@
                                         name,
                                         y: Math.round(parseFloat(item.total_sales) * 100) /
                                             100,
-                                        drilldown: id
+                                        drilldown: level === 'brand' ? '' : id
                                     };
                                 })
                             };

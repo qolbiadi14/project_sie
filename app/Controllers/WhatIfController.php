@@ -17,17 +17,43 @@ class WhatIfController extends BaseController
     {
         // Ambil data tahun dan produk dari database
         $years = $this->whatIfModel->getOrderYears();
-        $products = $this->whatIfModel->getProducts();
 
         $data = [
             'title' => 'Analisis What-If',
             'years' => $years,
-            'products' => $products
         ];
 
         return view('whatif_view', $data);
     }
 
+    public function getProductsByYear()
+    {
+        $year = $this->request->getPost('year');
+
+        if (!$year) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Tahun harus dipilih.'
+            ]);
+        }
+
+        // Ambil produk berdasarkan tahun yang dipilih user
+        $products = $this->whatIfModel->getProductsByYear($year);
+
+        if (!$products) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Tidak ada produk untuk tahun ini.'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'products' => $products
+        ]);
+    }
+
+    // Ambil detail data produk berdasarkan tahun dan produk yang dipilih
     public function getProductDetails()
     {
         $year = $this->request->getPost('year');
@@ -59,12 +85,12 @@ class WhatIfController extends BaseController
 
     public function analyseWhatIf()
     {
-        // Ambil data dari request
+        // ambil data dari request
         $price = $this->request->getPost('price');
         $sales_total = $this->request->getPost('total_sales');
         $target_revenue = $this->request->getPost('target_revenue');
 
-        // Validasi input
+        // validasi input
         if (!$price || !$sales_total || !$target_revenue) {
             return $this->response->setJSON([
                 'status' => 'error',
@@ -98,6 +124,4 @@ class WhatIfController extends BaseController
             ],
         ]);
     }
-
-
 }

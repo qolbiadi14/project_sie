@@ -20,7 +20,8 @@ class DrilldownController extends BaseController
         if ($level === 'year') {
             $data = $drilldownModel->getSalesPerBrand($value); // $value adalah tahun
         } elseif ($level === 'brand') {
-            $data = $drilldownModel->getSalesPerProduct($value); // $value adalah brand_name
+            $year = $this->request->getGet('year');
+            $data = $drilldownModel->getSalesPerProduct($value, $year); // $value adalah brand_name
         } else {
             return $this->response->setJSON(['error' => 'Invalid drilldown level']);
         }
